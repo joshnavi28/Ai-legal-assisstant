@@ -9,7 +9,6 @@ import 'react-simple-keyboard/build/css/index.css';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
-// Central list of document types (extendable)
 const DOC_TYPE_OPTIONS = [
   '',
   'Legal notice',
