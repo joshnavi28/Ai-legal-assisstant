@@ -1,8 +1,4 @@
 #!/usr/bin/env python3
-"""
-Advanced Legal AI Assistant - FastAPI Backend
-Resume-worthy legal AI application with advanced features
-"""
 
 from fastapi import FastAPI, File, UploadFile, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -14,7 +10,6 @@ import queue
 from pathlib import Path
 import os
 
-# Import core functionality (lightweight)
 from utils_fast import ask_indian_legalgpt_fast, upload_document_to_rag_fast, process_voice_input_fast
 from utils_fast import generate_legal_document_fast
 from speech_features import get_speech_processor
@@ -40,7 +35,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Lazy loading for heavy components
+
 document_analyzer = None
 multimodal_ai = None
 
@@ -97,10 +92,10 @@ async def root():
 async def ask_question(request: ChatRequest):
     """Ultra-fast legal Q&A - OPTIMIZED FOR SPEED"""
     try:
-        # Ultra-fast response using optimized function
+       
         response = ask_indian_legalgpt_fast(request.query)
         
-        # Lightweight analysis
+        
         analysis = {
             "query": request.query,
             "response": response,
@@ -123,7 +118,7 @@ async def ask_question(request: ChatRequest):
 async def upload_document(file: UploadFile = File(...)):
     """Advanced document upload with analysis - OPTIMIZED"""
     try:
-        # Save uploaded file
+       
         upload_dir = Path("uploads")
         upload_dir.mkdir(exist_ok=True)
         file_path = upload_dir / file.filename
@@ -132,9 +127,9 @@ async def upload_document(file: UploadFile = File(...)):
             content = await file.read()
             buffer.write(content)
         
-        # Basic analysis without heavy components
+        
         if file.filename.lower().endswith(('.png', '.jpg', '.jpeg')):
-            # Simple OCR processing
+            
             try:
                 import pytesseract
                 from PIL import Image
@@ -143,11 +138,11 @@ async def upload_document(file: UploadFile = File(...)):
             except:
                 extracted_text = "OCR processing not available"
         else:
-            # Text document processing
+           
             with open(file_path, 'r', encoding='utf-8') as f:
                 extracted_text = f.read()
         
-        # Upload to RAG system (fast mode)
+        
         rag_response = upload_document_to_rag_fast(str(file_path))
         
         return {
@@ -164,7 +159,7 @@ async def upload_document(file: UploadFile = File(...)):
 async def process_voice(file: UploadFile = File(...)):
     """Advanced voice processing with speech-to-text - OPTIMIZED"""
     try:
-        # Save audio file
+       
         upload_dir = Path("uploads")
         upload_dir.mkdir(exist_ok=True)
         audio_path = upload_dir / file.filename
@@ -173,12 +168,12 @@ async def process_voice(file: UploadFile = File(...)):
             content = await file.read()
             buffer.write(content)
         
-        # Use advanced speech processor
+       
         speech_processor = get_speech_processor()
         result = speech_processor.speech_to_text(str(audio_path))
         
         if result["success"]:
-            # Get legal response
+            
             response = ask_indian_legalgpt_fast(result["transcription"])
             
             return {
@@ -288,7 +283,7 @@ async def get_supported_languages():
 async def analyze_document(request: DocumentAnalysisRequest):
     """Advanced legal document analysis - OPTIMIZED"""
     try:
-        # Only load heavy components when needed
+       
         analyzer = get_document_analyzer()
         analysis = analyzer.generate_legal_summary(request.text)
         
@@ -309,7 +304,7 @@ async def analyze_document(request: DocumentAnalysisRequest):
 async def process_multimodal(request: MultimodalRequest):
     """Multi-modal legal AI processing - OPTIMIZED"""
     try:
-        # Only load heavy components when needed
+       
         multimodal = get_multimodal_ai()
         result = multimodal.process_multimodal_input(
             text_input=request.text_input,
@@ -344,24 +339,12 @@ async def get_features():
     """Get available advanced features"""
     return {
         "advanced_features": {
-            "custom_fine_tuning": "Fine-tuned model on Indian legal data",
             "document_analysis": "Advanced legal document analysis with OCR",
             "multimodal_ai": "Voice, text, and document processing",
-            "legal_risk_assessment": "AI-powered legal risk analysis",
-            "sentiment_analysis": "Legal document sentiment analysis",
-            "entity_extraction": "Extract legal entities from documents",
             "rag_enhancement": "Enhanced RAG with legal context",
             "voice_interface": "Voice-based legal assistant",
-            "ocr_document_processing": "OCR for legal document processing",
             "legal_summary_generation": "AI-generated legal summaries"
-        },
-        "resume_worthy": True,
-        "unique_aspects": [
-            "Custom fine-tuned legal model",
-            "Multi-modal AI processing",
-            "Advanced document analysis",
-            "Real-world legal impact"
-        ]
+        }
     }
 
 def _classify_legal_domain(query: str) -> str:
@@ -383,13 +366,7 @@ def _classify_legal_domain(query: str) -> str:
 
 if __name__ == "__main__":
     print("🚀 Starting Advanced Legal AI Assistant...")
-    print("✅ Resume-worthy features enabled:")
-    print("   • Custom fine-tuned legal model")
-    print("   • Multi-modal AI processing")
-    print("   • Advanced document analysis")
-    print("   • Enhanced RAG system")
-    print("   • Real-world legal impact")
-    print("⚡ Optimized for fast responses!")
+   
     
     port = int(os.getenv("PORT", 8000))
     host = os.getenv("HOST", "0.0.0.0")
