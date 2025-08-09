@@ -1,8 +1,5 @@
 #!/usr/bin/env python3
-"""
-Fast Legal AI Assistant - Optimized for Speed
-Lightweight version for instant responses
-"""
+
 
 import os
 import requests
