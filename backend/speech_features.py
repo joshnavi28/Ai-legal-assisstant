@@ -1,8 +1,4 @@
 #!/usr/bin/env python3
-"""
-Speech-to-Text and Text-to-Speech Features for Legal AI Assistant
-Resume-worthy speech processing capabilities
-"""
 
 import speech_recognition as sr
 import pyttsx3
@@ -21,7 +17,7 @@ import subprocess
 import shutil
 
 class SpeechProcessor:
-    """Advanced speech processing for legal AI assistant"""
+
     
     def __init__(self):
         self.recognizer = sr.Recognizer()
@@ -36,67 +32,54 @@ class SpeechProcessor:
     def _setup_tts(self):
         """Configure text-to-speech engine"""
         try:
-            # Get available voices
+            
             voices = self.engine.getProperty('voices')
             
-            # Set properties for better quality
-            self.engine.setProperty('rate', 150)  # Speed of speech
-            self.engine.setProperty('volume', 0.9)  # Volume level
             
-            # Try to set a good voice
+            self.engine.setProperty('rate', 150)  
+            self.engine.setProperty('volume', 0.9) 
+           
             if voices:
-                # Prefer female voice for legal assistant
+               
                 for voice in voices:
                     if 'female' in voice.name.lower() or 'zira' in voice.name.lower():
                         self.engine.setProperty('voice', voice.id)
                         break
                 else:
-                    # Fallback to first available voice
+                    
                     self.engine.setProperty('voice', voices[0].id)
                     
         except Exception as e:
             print(f"TTS setup warning: {e}")
     
     def _convert_audio_format(self, input_path: str, output_format: str = 'wav') -> str:
-        """
-        Convert audio file to required format using ffmpeg or fallback methods
-        
-        Args:
-            input_path: Path to input audio file
-            output_format: Desired output format (default: wav)
-            
-        Returns:
-            Path to converted audio file
-        """
+       
         try:
-            # Check if input file exists
+           
             if not os.path.exists(input_path):
                 raise FileNotFoundError(f"Input file not found: {input_path}")
             
-            # Get file extension
+           
             input_ext = Path(input_path).suffix.lower()
             output_ext = f".{output_format}"
-            
-            # If already in correct format, return original path
+        
             if input_ext == output_ext:
                 return input_path
-            
-            # Create output path
             output_path = str(Path(input_path).with_suffix(output_ext))
             
-            # Try using ffmpeg command first
+          
             try:
-                # Check if ffmpeg is available
+              
                 result = subprocess.run(['ffmpeg', '-version'], capture_output=True, text=True, timeout=5)
                 if result.returncode == 0:
-                    # FFmpeg is available, use it for conversion
+                   
                     cmd = [
                         'ffmpeg', '-i', input_path, 
                         '-acodec', 'pcm_s16le', 
                         '-ar', '16000', 
                         '-ac', '1', 
                         output_path, 
-                        '-y'  # Overwrite output file
+                        '-y'  
                     ]
                     
                     result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
@@ -110,7 +93,7 @@ class SpeechProcessor:
             except (subprocess.TimeoutExpired, FileNotFoundError, subprocess.SubprocessError) as e:
                 print(f"FFmpeg not available or conversion failed: {e}")
             
-            # Fallback: try using ffmpeg-python if available
+          
             try:
                 import ffmpeg
                 
@@ -127,7 +110,7 @@ class SpeechProcessor:
             except Exception as e:
                 print(f"FFmpeg-python conversion error: {e}")
             
-            # Fallback: try using pydub if available
+         
             try:
                 from pydub import AudioSegment
                 
@@ -141,7 +124,7 @@ class SpeechProcessor:
                 else:
                     audio = AudioSegment.from_file(input_path)
                 
-                # Export as WAV
+           
                 audio.export(output_path, format="wav")
                 
                 if os.path.exists(output_path):
@@ -153,13 +136,13 @@ class SpeechProcessor:
             except Exception as e:
                 print(f"Pydub conversion error: {e}")
             
-            # Final fallback: try to use the original file if it's a supported format
+           
             supported_formats = ['.wav', '.mp3', '.m4a', '.flac']
             if input_ext in supported_formats:
                 print(f"⚠️  Using original file format: {input_path}")
                 return input_path
             
-            # If all conversion methods fail, return original path and let speech recognition try
+         
             print(f"⚠️  Audio conversion failed, using original file: {input_path}")
             return input_path
             
@@ -168,34 +151,25 @@ class SpeechProcessor:
             return input_path
     
     def speech_to_text(self, audio_file_path: str, language: str = 'en-IN') -> Dict[str, Any]:
-        """
-        Convert speech to text with advanced error handling
-        
-        Args:
-            audio_file_path: Path to audio file
-            language: Language code (en-IN for Indian English, hi-IN for Hindi)
-            
-        Returns:
-            Dict with transcription and confidence
-        """
+    
         try:
             print(f"🎤 Processing audio file: {audio_file_path}")
             
-            # Convert audio to wav format if needed
+           
             converted_audio_path = self._convert_audio_format(audio_file_path, 'wav')
             print(f"🎵 Converted audio path: {converted_audio_path}")
             
             with sr.AudioFile(converted_audio_path) as source:
-                # Adjust for ambient noise
+               
                 print("🔊 Adjusting for ambient noise...")
                 self.recognizer.adjust_for_ambient_noise(source, duration=0.5)
                 audio = self.recognizer.record(source)
                 
-                # Try multiple recognition services
+              
                 transcription = None
                 confidence = 0.0
                 
-                # Try Google Speech Recognition
+              
                 print("🌐 Trying Google Speech Recognition...")
                 try:
                     result = self.recognizer.recognize_google(
@@ -216,7 +190,7 @@ class SpeechProcessor:
                 except Exception as e:
                     print(f"⚠️  Google recognition error: {e}")
                 
-                # Fallback to Sphinx if Google fails
+               
                 if not transcription:
                     print("🔍 Trying Sphinx recognition...")
                     try:
@@ -261,16 +235,7 @@ class SpeechProcessor:
             }
     
     def text_to_speech(self, text: str, output_path: Optional[str] = None) -> Dict[str, Any]:
-        """
-        Convert text to speech with legal context awareness
-        
-        Args:
-            text: Text to convert to speech
-            output_path: Optional path to save audio file
-            
-        Returns:
-            Dict with status and audio info
-        """
+     
         try:
             # Legal context processing
             processed_text = self._process_legal_context(text)
@@ -296,7 +261,7 @@ class SpeechProcessor:
                     ]
                 }
             else:
-                # Play directly
+                # Play 
                 self.engine.say(processed_text)
                 self.engine.runAndWait()
                 
@@ -318,8 +283,6 @@ class SpeechProcessor:
             }
     
     def _process_legal_context(self, text: str) -> str:
-        """Process text for legal context awareness"""
-        # Add pauses for legal terms
         legal_terms = [
             "Article", "Section", "Clause", "Subsection",
             "Constitution", "Act", "Regulation", "Statute"
@@ -328,7 +291,7 @@ class SpeechProcessor:
         processed_text = text
         for term in legal_terms:
             if term in processed_text:
-                # Add slight pause before legal terms
+               
                 processed_text = processed_text.replace(term, f" ... {term}")
         
         return processed_text
@@ -351,7 +314,7 @@ class SpeechProcessor:
             return {}
     
     def start_realtime_recording(self) -> Dict[str, Any]:
-        """Start real-time speech recording"""
+       
         try:
             self.is_recording = True
             self.audio_thread = threading.Thread(target=self._record_audio)
@@ -434,7 +397,7 @@ class SpeechProcessor:
             print(f"Recording error: {e}")
     
     def get_supported_languages(self) -> Dict[str, Any]:
-        """Get supported languages for speech recognition"""
+    
         return {
             "languages": {
                 "en-IN": "Indian English",
