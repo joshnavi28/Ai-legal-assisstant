@@ -12,19 +12,9 @@ This is a **Indian legal AI assistant** specifically designed for Indian legal c
 
 ## 🚀 Quick Start
 
-### Prerequisites
-```bash
-# Install Python dependencies
-pip install -r requirements.txt
-
-# Install spaCy model
-python -m spacy download en_core_web_sm
-```
-
 ### Backend Setup
 ```bash
 cd backend
-python advanced_features_setup.py
 uvicorn main:app --reload
 ```
 
